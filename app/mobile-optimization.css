@@ -1,0 +1,245 @@
+/* Mobile-First Responsive Design Optimization */
+
+/* Base mobile styles (320px+) */
+@media (max-width: 768px) {
+  /* Page spacing */
+  body {
+    font-size: 14px;
+  }
+
+  /* Headers */
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  /* Card stacking */
+  .glass {
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  /* Button sizing */
+  .btn-lg {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  /* Grid columns - mobile first */
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Sticky action buttons */
+  .sticky-action {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 40;
+    border-radius: 12px;
+    min-height: 52px;
+  }
+
+  /* Hide desktop-only elements */
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  /* Show mobile-only elements */
+  .visible-mobile {
+    display: block !important;
+  }
+
+  /* Simplified charts on mobile */
+  .recharts-wrapper {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Better touch targets */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Input fields */
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+    width: 100%;
+  }
+
+  /* Reduce chart height on mobile */
+  [class*="recharts"] {
+    height: 200px !important;
+  }
+
+  /* Sidebar adjustments */
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 80%;
+    height: 100vh;
+    transition: left 0.3s ease;
+    z-index: 50;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  /* Bottom navigation for mobile */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: hsl(var(--background));
+    border-top: 1px solid hsl(var(--border));
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 40;
+  }
+
+  /* Hero section adjustments */
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  /* Grid responsiveness */
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Stat cards */
+  .stat-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  /* Typography adjustments */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Remove hover effects on touch devices */
+  @media (hover: none) {
+    button:hover,
+    a:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Tablet styles (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .glass {
+    padding: 1.5rem;
+  }
+
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Desktop styles (1025px+) */
+@media (min-width: 1025px) {
+  .glass {
+    padding: 1.5rem;
+  }
+
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .hidden-desktop {
+    display: none !important;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Landscape orientation */
+@media (orientation: landscape) and (max-height: 500px) {
+  header {
+    height: 40px;
+  }
+
+  main {
+    padding: 0.5rem;
+  }
+
+  .glass {
+    padding: 0.75rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Light mode adjustments */
+@media (prefers-color-scheme: light) {
+  .glass {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Print styles */
+@media print {
+  header,
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .glass {
+    background: white;
+    border: 1px solid #ccc;
+  }
+
+  main {
+    max-width: 100%;
+  }
+}
