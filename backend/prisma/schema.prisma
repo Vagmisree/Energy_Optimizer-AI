@@ -1,1 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanType {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum RecommendationCategory {
+  AC
+  LIGHTING
+  APPLIANCE
+  BILLING
+  SOLAR
+  SCHEDULING
+  BEHAVIOR
+}
+
+enum ActionType {
+  SHIFT_TO_OFF_PEAK
+  REDUCE_AC_TEMP
+  TURN_OFF_DEVICE
+  SCHEDULE_APPLIANCE
+  ENABLE_ECO_MODE
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  passwordHash       String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  planType           PlanType            @default(FREE)
+  homeSize           Int                 @default(2)
+  city               String              @default("Hyderabad")
+  tariffRatePeak     Float               @default(10.5)
+  tariffRateOffPeak  Float               @default(6.2)
+  monthlyBudget      Float               @default(3000)
+
+  appliances         Appliance[]
+  readings           EnergyReading[]
+  forecasts          Forecast[]
+  recommendations    Recommendation[]
+  actions            OptimizationAction[]
+  alerts             Alert[]
+  auditLogs          AuditLog[]
+}
+
+model Appliance {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  category       String
+  wattage        Int
+  dailyHours     Float
+  isSmartEnabled Boolean     @default(false)
+  priority       Int         @default(3)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  usages         ApplianceUsage[]
+  actions        OptimizationAction[]
+
+  @@index([userId])
+}
+
+model EnergyReading {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  timestamp       DateTime
+  totalUsageKwh   Float
+  totalBill       Float
+  peakUsageKwh    Float
+  offPeakUsageKwh Float
+  carbonKg        Float
+  source          String   @default("manual")
+  createdAt       DateTime @default(now())
+
+  @@index([userId, timestamp])
+}
+
+model ApplianceUsage {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applianceId String
+  appliance   Appliance @relation(fields: [applianceId], references: [id], onDelete: Cascade)
+
+  timestamp   DateTime
+  usageKwh    Float
+  cost        Float
+  status      String
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, timestamp])
+}
+
+model Forecast {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  month             String
+  predictedUsageKwh Float
+  predictedBill     Float
+  confidenceScore   Float
+  explanation       String
+  createdAt         DateTime @default(now())
+
+  @@index([userId, month])
+}
+
+model Recommendation {
+  id               String                  @id @default(cuid())
+  userId           String
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title            String
+  description      String
+  impactScore      Int
+  estimatedSavings Float
+  priority         Int                     @default(2)
+  category         RecommendationCategory
+  isApplied        Boolean                 @default(false)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model OptimizationAction {
+  id               String      @id @default(cuid())
+  userId           String
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  actionType       ActionType
+  applianceName    String
+  oldValue         String
+  newValue         String
+  estimatedSavings Float
+  timestamp        DateTime    @default(now())
+  createdAt        DateTime    @default(now())
+
+  @@index([userId, timestamp])
+}
+
+model Alert {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  severity    AlertSeverity
+  title       String
+  message     String
+  isRead      Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  @@index([userId, isRead])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType   String
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
