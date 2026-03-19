@@ -132,14 +132,28 @@ export default function Home() {
               />
             </div>
 
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Charts Section Title */}
+            <div className="flex items-center gap-3 pt-2">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              <h2 className="text-lg font-semibold text-muted-foreground px-4">Analytics Overview</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+
+            {/* Charts Row - Equal Height */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
               <UsageChart />
               <BillChart />
             </div>
 
-            {/* Bottom Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Bottom Section Title */}
+            <div className="flex items-center gap-3 pt-2">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              <h2 className="text-lg font-semibold text-muted-foreground px-4">Detailed Breakdown</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+
+            {/* Bottom Row - Equal Height */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
               <ApplianceChart />
               <AIInsightsPanel />
               <EnergyScoreCard score={energyStats.energyScore} />
