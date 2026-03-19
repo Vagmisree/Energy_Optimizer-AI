@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { LiveStatusBanner } from "@/components/notifications"
+import { AIAutopilot } from "@/components/ai-autopilot"
+import { LiveEnergyPulse } from "@/components/live-energy-pulse"
+import { DemoMode } from "@/components/demo-mode"
 import { energyStats } from "@/lib/energy-data"
 
 export default function Home() {
@@ -130,6 +133,20 @@ export default function Home() {
                 trend={{ value: 5, isPositive: true }}
                 glowColor="primary"
               />
+            </div>
+
+            {/* AI Control Center Section */}
+            <div className="flex items-center gap-3 pt-2">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+              <h2 className="text-lg font-semibold text-primary px-4">AI Control Center</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            </div>
+
+            {/* AI Autopilot + Live Pulse + Demo */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+              <AIAutopilot />
+              <LiveEnergyPulse />
+              <DemoMode />
             </div>
 
             {/* Charts Section Title */}
