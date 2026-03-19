@@ -33,16 +33,17 @@ import {
 } from "@/components/ui/sidebar"
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Analyze", href: "/analyze", icon: BarChart3 },
-  { name: "Insights", href: "/insights", icon: TrendingUp },
-  { name: "AI Assistant", href: "/assistant", icon: Bot },
-  { name: "Smart Scheduler", href: "/scheduler", icon: Clock },
-  { name: "Time Machine", href: "/time-machine", icon: Timer },
-  { name: "Simulator", href: "/simulator", icon: Gamepad2 },
-  { name: "Achievements", href: "/achievements", icon: Trophy },
-  { name: "Reports", href: "/reports", icon: FileText },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, section: "main" },
+  { name: "Insights", href: "/insights", icon: TrendingUp, section: "main" },
+  { name: "Analyze", href: "/analyze", icon: BarChart3, section: "main" },
+  { name: "AI Assistant", href: "/assistant", icon: Bot, section: "ai" },
+  { name: "Smart Scheduler", href: "/scheduler", icon: Clock, section: "automation" },
+  { name: "Time Machine", href: "/time-machine", icon: Timer, section: "automation" },
+  { name: "Simulator", href: "/simulator", icon: Gamepad2, section: "automation" },
+  { name: "Reports", href: "/reports", icon: FileText, section: "insights" },
+  { name: "Achievements", href: "/achievements", icon: Trophy, section: "insights" },
+  { name: "Profile", href: "/profile", icon: LayoutDashboard, section: "insights" },
+  { name: "Settings", href: "/settings", icon: Settings, section: "system" },
 ]
 
 export function AppSidebar() {
