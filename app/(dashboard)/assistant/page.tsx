@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+
 import { Bot, Send, User, Sparkles, Zap, Lightbulb, TrendingDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -208,6 +209,28 @@ export default function AssistantPage() {
 
   const handleSuggestedQuestion = (question: string) => {
     setInput(question)
+  }
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-4rem)]">
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Bot className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">AI Energy Assistant</h1>
+              <p className="text-sm text-muted-foreground">Powered by advanced AI for personalized insights</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+      </div>
+    )
   }
 
   return (
