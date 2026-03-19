@@ -7,26 +7,28 @@ export const energyStats = {
 }
 
 export const monthlyData = [
-  { month: "Jan", usage: 280, prediction: 290, bill: 2240 },
-  { month: "Feb", usage: 310, prediction: 300, bill: 2480 },
-  { month: "Mar", usage: 295, prediction: 305, bill: 2360 },
-  { month: "Apr", usage: 340, prediction: 330, bill: 2720 },
-  { month: "May", usage: 380, prediction: 360, bill: 3040 },
-  { month: "Jun", usage: 420, prediction: 400, bill: 3360 },
-  { month: "Jul", usage: 450, prediction: 430, bill: 3600 },
-  { month: "Aug", usage: 430, prediction: 420, bill: 3440 },
-  { month: "Sep", usage: 360, prediction: 370, bill: 2880 },
-  { month: "Oct", usage: 320, prediction: 340, bill: 2560 },
-  { month: "Nov", usage: 300, prediction: 310, bill: 2400 },
-  { month: "Dec", usage: 342, prediction: 350, bill: 2736 },
+  { month: "Jan", usage: 285, prediction: 290, bill: 2280, savings: 120 },
+  { month: "Feb", usage: 298, prediction: 305, bill: 2384, savings: 95 },
+  { month: "Mar", usage: 312, prediction: 320, bill: 2496, savings: 80 },
+  { month: "Apr", usage: 356, prediction: 345, bill: 2848, savings: 0 },
+  { month: "May", usage: 398, prediction: 380, bill: 3184, savings: 0 },
+  { month: "Jun", usage: 445, prediction: 420, bill: 3560, savings: 0 },
+  { month: "Jul", usage: 468, prediction: 450, bill: 3744, savings: 0 },
+  { month: "Aug", usage: 452, prediction: 440, bill: 3616, savings: 50 },
+  { month: "Sep", usage: 378, prediction: 385, bill: 3024, savings: 150 },
+  { month: "Oct", usage: 325, prediction: 335, bill: 2600, savings: 200 },
+  { month: "Nov", usage: 295, prediction: 305, bill: 2360, savings: 180 },
+  { month: "Dec", usage: 342, prediction: 350, bill: 2736, savings: 140 },
 ]
 
 export const applianceBreakdown = [
-  { name: "Air Conditioner", usage: 40, color: "hsl(var(--chart-1))" },
-  { name: "Refrigerator", usage: 18, color: "hsl(var(--chart-2))" },
-  { name: "Water Heater", usage: 15, color: "hsl(var(--chart-3))" },
-  { name: "Lighting", usage: 12, color: "hsl(var(--chart-4))" },
-  { name: "Others", usage: 15, color: "hsl(var(--chart-5))" },
+  { name: "Air Conditioner", usage: 38, kWh: 130, cost: 1040 },
+  { name: "Refrigerator", usage: 20, kWh: 68, cost: 544 },
+  { name: "Water Heater", usage: 14, kWh: 48, cost: 384 },
+  { name: "Washing Machine", usage: 8, kWh: 27, cost: 216 },
+  { name: "Lighting", usage: 10, kWh: 34, cost: 272 },
+  { name: "TV & Entertainment", usage: 6, kWh: 20, cost: 160 },
+  { name: "Others", usage: 4, kWh: 15, cost: 120 },
 ]
 
 export const hourlyUsage = Array.from({ length: 24 }, (_, i) => ({
