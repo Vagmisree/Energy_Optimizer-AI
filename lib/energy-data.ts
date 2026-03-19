@@ -82,29 +82,81 @@ export const energyPersonalities = [
   { type: "high_consumer", name: "High Consumer", emoji: "zap", description: "Focus on comfort over savings" },
 ]
 
+// Indian Electricity Tariff Slabs
+const TARIFF_SLABS = [
+  { min: 0, max: 50, rate: 3.25 },
+  { min: 50, max: 100, rate: 4.05 },
+  { min: 100, max: 200, rate: 5.45 },
+  { min: 200, max: 300, rate: 6.95 },
+  { min: 300, max: 400, rate: 7.50 },
+  { min: 400, max: 500, rate: 8.00 },
+  { min: 500, max: Infinity, rate: 8.50 },
+]
+
+function calculateSlabBill(units: number): number {
+  let remainingUnits = units
+  let total = 0
+
+  for (const slab of TARIFF_SLABS) {
+    if (remainingUnits <= 0) break
+    const slabUnits = Math.min(remainingUnits, slab.max - slab.min)
+    if (slabUnits > 0) {
+      total += slabUnits * slab.rate
+      remainingUnits -= slabUnits
+    }
+  }
+
+  return total
+}
+
 export function calculateSavings(
   units: number,
   appliances: string[],
   usageHours: number,
   isPeakUsage: boolean
 ): { predictedUsage: number; estimatedBill: number; potentialSavings: number } {
-  const baseRate = 8 // INR per unit
-  const peakMultiplier = isPeakUsage ? 1.25 : 1
+  // Base consumption adjustment based on appliances
+  const applianceFactors: Record<string, number> = {
+    ac: 0.38, // AC typically 38% of bill
+    refrigerator: 0.12,
+    heater: 0.14,
+    washing: 0.08,
+    lighting: 0.10,
+    tv: 0.06,
+    computer: 0.08,
+    fan: 0.04,
+  }
   
-  const applianceMultiplier = appliances.reduce((acc, appliance) => {
-    const multipliers: Record<string, number> = {
-      ac: 1.4,
-      refrigerator: 1.15,
-      heater: 1.3,
-      washing: 1.1,
-      lighting: 1.05,
-    }
-    return acc * (multipliers[appliance] || 1)
-  }, 1)
+  // Calculate total appliance factor
+  let totalFactor = 0
+  appliances.forEach(app => {
+    totalFactor += applianceFactors[app.toLowerCase()] || 0.05
+  })
   
-  const predictedUsage = Math.round(units * applianceMultiplier * (usageHours / 8))
-  const estimatedBill = Math.round(predictedUsage * baseRate * peakMultiplier)
-  const potentialSavings = Math.round(estimatedBill * 0.25) // 25% potential savings
+  // Normalize if too high
+  totalFactor = Math.min(totalFactor, 1.0)
+  if (totalFactor === 0) totalFactor = 0.6 // Default assumption
+  
+  // Adjust usage based on hours (8 hours is baseline)
+  const hoursFactor = 0.7 + (usageHours / 24) * 0.6
+  
+  // Peak usage adds 20% surcharge
+  const peakMultiplier = isPeakUsage ? 1.20 : 1.0
+  
+  // Predict usage
+  const predictedUsage = Math.round(units * hoursFactor)
+  
+  // Calculate bill using slab structure
+  const baseEnergy = calculateSlabBill(predictedUsage)
+  const fixedCharges = 55 // Fixed + meter rent
+  const fuelAdjustment = Math.round(predictedUsage * 0.15)
+  const taxes = Math.round((baseEnergy + fixedCharges + fuelAdjustment) * 0.11) // 11% taxes and duties
+  
+  const estimatedBill = Math.round((baseEnergy + fixedCharges + fuelAdjustment + taxes) * peakMultiplier)
+  
+  // Savings potential: 18-25% based on appliances and peak usage
+  const savingsRate = isPeakUsage ? 0.25 : 0.18
+  const potentialSavings = Math.round(estimatedBill * savingsRate)
   
   return { predictedUsage, estimatedBill, potentialSavings }
 }
