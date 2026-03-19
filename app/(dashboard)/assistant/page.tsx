@@ -134,7 +134,18 @@ Your current energy score is **78/100**, and there's potential to save **₹500-
 What specific aspect would you like me to focus on?`
 }
 
+// Format time consistently to avoid hydration mismatch
+function formatTime(date: Date): string {
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const formattedHours = hours % 12 || 12
+  const formattedMinutes = minutes.toString().padStart(2, '0')
+  return `${formattedHours}:${formattedMinutes} ${ampm}`
+}
+
 export default function AssistantPage() {
+  const [mounted, setMounted] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -153,6 +164,11 @@ What would you like to know about your energy usage?`,
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Set mounted state on client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -268,7 +284,7 @@ What would you like to know about your energy usage?`,
                 })}
               </div>
               <p className="text-xs text-muted-foreground mt-3">
-                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {mounted ? formatTime(message.timestamp) : ''}
               </p>
             </div>
           </div>
