@@ -144,13 +144,10 @@ function formatTime(date: Date): string {
   return `${formattedHours}:${formattedMinutes} ${ampm}`
 }
 
-export default function AssistantPage() {
-  const [mounted, setMounted] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: `Hello! I'm your AI Energy Assistant. I can help you:
+const initialMessage: Omit<Message, 'timestamp'> & { timestamp?: Date } = {
+  id: "1",
+  role: "assistant",
+  content: `Hello! I'm your AI Energy Assistant. I can help you:
 
 - Analyze your energy consumption patterns
 - Provide personalized savings recommendations
@@ -158,16 +155,19 @@ export default function AssistantPage() {
 - Suggest optimal usage schedules
 
 What would you like to know about your energy usage?`,
-      timestamp: new Date(),
-    },
-  ])
+}
+
+export default function AssistantPage() {
+  const [mounted, setMounted] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Set mounted state on client
+  // Set mounted state and initialize messages on client only
   useEffect(() => {
     setMounted(true)
+    setMessages([{ ...initialMessage, timestamp: new Date() }])
   }, [])
 
   const scrollToBottom = () => {
@@ -283,7 +283,7 @@ What would you like to know about your energy usage?`,
                   )
                 })}
               </div>
-              <p className="text-xs text-muted-foreground mt-3">
+              <p className="text-xs text-muted-foreground mt-3" suppressHydrationWarning>
                 {mounted ? formatTime(message.timestamp) : ''}
               </p>
             </div>
