@@ -10,7 +10,7 @@ interface Message {
   id: string
   role: "user" | "assistant"
   content: string
-  timestamp: Date
+  timestamp: number
 }
 
 const suggestedQuestions = [
@@ -23,59 +23,59 @@ const suggestedQuestions = [
 const aiResponses: Record<string, string> = {
   "how can i reduce my electricity bill": `Based on your usage patterns, here are personalized recommendations to reduce your bill:
 
-**1. Optimize AC Usage (Save ₹400-600/month)**
-- Set temperature to 24-25°C instead of lower settings
+**1. Optimize AC Usage (Save 400-600 INR/month)**
+- Set temperature to 24-25 deg C instead of lower settings
 - Clean filters monthly for 15% better efficiency
 - Use timer to turn off during sleeping hours
 
-**2. Switch to LED Lighting (Save ₹200-300/month)**
+**2. Switch to LED Lighting (Save 200-300 INR/month)**
 - Replace incandescent bulbs with LED
 - Use task lighting instead of room lighting
 - Install motion sensors in less-used areas
 
-**3. Shift to Off-Peak Hours (Save ₹150-250/month)**
+**3. Shift to Off-Peak Hours (Save 150-250 INR/month)**
 - Run washing machine after 10 PM
 - Charge devices during off-peak hours
 - Schedule heavy appliances for weekends
 
-**Potential Total Savings: ₹750-1,150/month**`,
+**Potential Total Savings: 750-1,150 INR/month**`,
 
   "which appliances use the most energy": `Based on your home analysis, here's your energy consumption breakdown:
 
 **Top Energy Consumers:**
 
-1. **Air Conditioner - 40%** (₹1,140/month)
+1. **Air Conditioner - 40%** (1,140 INR/month)
    - Tip: Each degree higher saves 6% energy
 
-2. **Refrigerator - 18%** (₹513/month)
+2. **Refrigerator - 18%** (513 INR/month)
    - Tip: Keep it 3/4 full for optimal efficiency
 
-3. **Water Heater - 15%** (₹428/month)
-   - Tip: Lower thermostat to 50°C
+3. **Water Heater - 15%** (428 INR/month)
+   - Tip: Lower thermostat to 50 deg C
 
-4. **Lighting - 12%** (₹342/month)
+4. **Lighting - 12%** (342 INR/month)
    - Tip: LED bulbs use 75% less energy
 
-5. **Others - 15%** (₹428/month)
+5. **Others - 15%** (428 INR/month)
    - TV, computer, fans, etc.
 
-**Quick Win:** Focusing on AC optimization alone could save you ₹400-600/month!`,
+**Quick Win:** Focusing on AC optimization alone could save you 400-600 INR/month!`,
 
   "what are the best energy-saving tips": `Here are the most effective energy-saving tips for your home:
 
 **Immediate Actions (No Cost):**
-- Unplug devices when not in use (saves ₹100-150/month)
+- Unplug devices when not in use (saves 100-150 INR/month)
 - Use natural light during daytime
 - Turn off lights when leaving a room
-- Set AC to 24°C minimum
+- Set AC to 24 deg C minimum
 
-**Short-term Investments (₹1,000-5,000):**
+**Short-term Investments (1,000-5,000 INR):**
 - LED bulbs - payback in 3-4 months
 - Smart power strips - eliminates phantom loads
 - Timer switches for water heater
 - Ceiling fan regulators
 
-**Long-term Investments (₹10,000+):**
+**Long-term Investments (10,000+ INR):**
 - 5-star rated appliances
 - Solar water heater
 - Rooftop solar panels
@@ -110,18 +110,16 @@ Start with AC optimization and LED conversion - these two changes alone can redu
 2. Install a programmable thermostat
 3. Consider solar panels for daytime usage
 
-Implementing these changes could improve your score to 90+ and save ₹800-1,200/month!`,
+Implementing these changes could improve your score to 90+ and save 800-1,200 INR/month!`,
 }
 
-function getAIResponse(message: string): string {
-  const lowerMessage = message.toLowerCase()
-  
+function getAIResponse(userMsg: string): string {
+  const lower = userMsg.toLowerCase()
   for (const [key, response] of Object.entries(aiResponses)) {
-    if (lowerMessage.includes(key) || key.split(" ").some(word => lowerMessage.includes(word))) {
+    if (lower.includes(key) || key.split(" ").some(word => lower.includes(word))) {
       return response
     }
   }
-  
   return `Thank you for your question! Based on your energy profile, I can help you with:
 
 - **Bill Reduction Strategies** - Personalized tips to lower your electricity costs
@@ -129,17 +127,33 @@ function getAIResponse(message: string): string {
 - **Usage Pattern Analysis** - Understand your consumption habits
 - **Savings Calculations** - Estimate potential savings from changes
 
-Your current energy score is **78/100**, and there's potential to save **₹500-1,200/month** with the right optimizations.
+Your current energy score is **78/100**, and there's potential to save **500-1,200 INR/month** with the right optimizations.
 
 What specific aspect would you like me to focus on?`
 }
 
+function displayTime(ts: number): string {
+  const d = new Date(ts)
+  const h = d.getHours()
+  const m = d.getMinutes()
+  const ap = h >= 12 ? "PM" : "AM"
+  return `${h % 12 || 12}:${m.toString().padStart(2, "0")} ${ap}`
+}
+
 export default function AssistantPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: `Hello! I'm your AI Energy Assistant. I can help you:
+  const [ready, setReady] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const endRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setReady(true)
+    setMessages([
+      {
+        id: "1",
+        role: "assistant",
+        content: `Hello! I'm your AI Energy Assistant. I can help you:
 
 - Analyze your energy consumption patterns
 - Provide personalized savings recommendations
@@ -147,56 +161,60 @@ export default function AssistantPage() {
 - Suggest optimal usage schedules
 
 What would you like to know about your energy usage?`,
-      timestamp: new Date(),
-    },
-  ])
-  const [input, setInput] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+        timestamp: Date.now(),
+      },
+    ])
+  }, [])
 
   useEffect(() => {
-    scrollToBottom()
+    endRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
   const handleSend = async () => {
     if (!input.trim()) return
-
-    const userMessage: Message = {
+    const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     }
-
-    setMessages((prev) => [...prev, userMessage])
+    setMessages(prev => [...prev, userMsg])
     setInput("")
     setIsTyping(true)
-
-    // Simulate AI thinking
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000))
-
-    const aiMessage: Message = {
+    await new Promise(r => setTimeout(r, 1000 + Math.random() * 1000))
+    const aiMsg: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
       content: getAIResponse(input),
-      timestamp: new Date(),
+      timestamp: Date.now(),
     }
-
     setIsTyping(false)
-    setMessages((prev) => [...prev, aiMessage])
+    setMessages(prev => [...prev, aiMsg])
   }
 
-  const handleSuggestedQuestion = (question: string) => {
-    setInput(question)
+  if (!ready) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-4rem)]">
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Bot className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">AI Energy Assistant</h1>
+              <p className="text-sm text-muted-foreground">Powered by advanced AI for personalized insights</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center glow-sm">
@@ -209,7 +227,6 @@ What would you like to know about your energy usage?`,
         </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.map((message) => (
           <div
@@ -227,11 +244,7 @@ What would you like to know about your energy usage?`,
                   : "bg-primary/10 text-primary"
               )}
             >
-              {message.role === "user" ? (
-                <User className="w-5 h-5" />
-              ) : (
-                <Bot className="w-5 h-5" />
-              )}
+              {message.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
             </div>
             <div
               className={cn(
@@ -252,23 +265,19 @@ What would you like to know about your energy usage?`,
                   }
                   if (line.startsWith("- ")) {
                     return (
-                      <p key={i} className="text-muted-foreground my-1 pl-4">
-                        {line}
-                      </p>
+                      <p key={i} className="text-muted-foreground my-1 pl-4">{line}</p>
                     )
                   }
                   if (line.trim() === "") {
                     return <br key={i} />
                   }
                   return (
-                    <p key={i} className="text-foreground my-1">
-                      {line}
-                    </p>
+                    <p key={i} className="text-foreground my-1">{line}</p>
                   )
                 })}
               </div>
-              <p className="text-xs text-muted-foreground mt-3">
-                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              <p className="text-xs text-muted-foreground mt-3" suppressHydrationWarning>
+                {displayTime(message.timestamp)}
               </p>
             </div>
           </div>
@@ -288,11 +297,9 @@ What would you like to know about your energy usage?`,
             </div>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
+        <div ref={endRef} />
       </div>
 
-      {/* Suggested Questions */}
       {messages.length <= 2 && (
         <div className="px-6 pb-4">
           <p className="text-sm text-muted-foreground mb-3">Suggested questions:</p>
@@ -300,7 +307,7 @@ What would you like to know about your energy usage?`,
             {suggestedQuestions.map((q, i) => (
               <button
                 key={i}
-                onClick={() => handleSuggestedQuestion(q.text)}
+                onClick={() => setInput(q.text)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl glass glass-hover text-sm font-medium text-foreground"
               >
                 <q.icon className="w-4 h-4 text-primary" />
@@ -311,13 +318,9 @@ What would you like to know about your energy usage?`,
         </div>
       )}
 
-      {/* Input */}
       <div className="p-6 border-t border-border">
         <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSend()
-          }}
+          onSubmit={(e) => { e.preventDefault(); handleSend() }}
           className="flex gap-3 max-w-3xl mx-auto"
         >
           <Input

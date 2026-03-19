@@ -16,6 +16,8 @@ import {
   Zap,
   Moon,
   Sun,
+  Cpu,
+  Play,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
@@ -37,6 +39,7 @@ const navigation = [
   { name: "Insights", href: "/insights", icon: TrendingUp, section: "main" },
   { name: "Analyze", href: "/analyze", icon: BarChart3, section: "main" },
   { name: "AI Assistant", href: "/assistant", icon: Bot, section: "ai" },
+  { name: "AI Autopilot", href: "/autopilot", icon: Cpu, section: "ai" },
   { name: "Smart Scheduler", href: "/scheduler", icon: Clock, section: "automation" },
   { name: "Time Machine", href: "/time-machine", icon: Timer, section: "automation" },
   { name: "Simulator", href: "/simulator", icon: Gamepad2, section: "automation" },

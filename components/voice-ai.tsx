@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Mic, MicOff, Volume2, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,13 +14,28 @@ interface VoiceQuery {
   isProcessing?: boolean
 }
 
+// Format time consistently to avoid hydration mismatch
+function formatTime(date: Date): string {
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const formattedHours = hours % 12 || 12
+  const formattedMinutes = minutes.toString().padStart(2, '0')
+  return `${formattedHours}:${formattedMinutes} ${ampm}`
+}
+
 export function VoiceAIAssistant() {
+  const [mounted, setMounted] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [queries, setQueries] = useState<VoiceQuery[]>([])
   const [transcript, setTranscript] = useState('')
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const mockVoiceResponses: { [key: string]: string } = {
     'how much': 'Your estimated monthly bill is ₹3,500. Peak hour usage is adding ₹1,200 to your bill.',
@@ -147,8 +162,8 @@ export function VoiceAIAssistant() {
               <Volume2 className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">{q.query}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {q.timestamp.toLocaleTimeString()}
+                <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>
+                  {mounted ? formatTime(q.timestamp) : ''}
                 </p>
               </div>
             </div>
